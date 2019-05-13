@@ -1,0 +1,49 @@
+{
+  "name": "vscode-iot-device-cube",
+  "displayName": "IoT Device Cube",
+  "description": "Utility extension to access to physical devices",
+  "version": "0.0.1",
+  "publisher": "vsciot-vscode",
+  "engines": {
+    "vscode": "^1.33.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/src/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile && webpack --mode production",
+    "compile": "tsc -p .",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test",
+    "check": "gts check",
+    "clean": "gts clean",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
+  },
+  "devDependencies": {
+    "@types/fs-plus": "^3.0.1",
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^10.12.21",
+    "@types/ssh2": "^0.5.38",
+    "fs-plus": "^3.1.1",
+    "gts": "^1.0.0",
+    "tslint": "^5.12.1",
+    "typescript": "~3.4.0",
+    "vscode": "^1.1.28",
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2"
+  },
+  "dependencies": {
+    "impor": "^0.1.1",
+    "molehole": "^0.1.3",
+    "ssh2": "^0.8.4",
+    "volumelist": "^0.1.8"
+  }
+}
