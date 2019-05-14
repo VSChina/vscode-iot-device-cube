@@ -83,7 +83,7 @@ export class SSH {
 
       channel.setWindow(10, 500, 10, 100);
 
-      channel.end(command + '\nexit\n');
+      channel.end(command + '\n');
     });
 
     return event;

@@ -3,6 +3,7 @@
   "displayName": "IoT Device Cube",
   "description": "Utility extension to access to physical devices",
   "version": "0.0.1",
+  "extensionKind": "ui",
   "publisher": "vsciot-vscode",
   "engines": {
     "vscode": "^1.33.0"
