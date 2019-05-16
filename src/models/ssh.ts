@@ -99,14 +99,42 @@ export class SSH {
           output += chunk;
         });
 
-        cmd.on('close', () => {
+        cmd.once('close', () => {
+          cmd.removeAllListeners();
           resolve(output);
           return;
         });
 
-        cmd.on('error', (error: Error) => {
+        cmd.once('error', (error: Error) => {
+          cmd.removeAllListeners();
           reject(error);
           return;
+        });
+      }
+    );
+  }
+
+  private static async ensureFolder(
+    sftp: ssh2.SFTPWrapper,
+    remotePath: string
+  ) {
+    return new Promise(
+      (resolve: (value: void) => void, reject: (error: Error) => void) => {
+        sftp.readdir(remotePath, (error: Error) => {
+          if (error) {
+            sftp.mkdir(remotePath, (error: Error) => {
+              if (error) {
+                reject(error);
+                return;
+              }
+
+              resolve();
+              return;
+            });
+          } else {
+            resolve();
+            return;
+          }
         });
       }
     );
@@ -134,8 +162,8 @@ export class SSH {
             path.basename(localPath)
           );
           remotePath = remotePath.replace(/[\/\\]+/g, '/');
-          await SSH.exec(id, `mkdir -p ${remoteFolderPath}`);
 
+          await SSH.ensureFolder(sftp, remoteFolderPath);
           sftp.fastPut(localPath, remotePath, (error: Error) => {
             if (error) {
               reject(error);

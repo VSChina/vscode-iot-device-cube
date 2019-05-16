@@ -8,9 +8,9 @@ const filesystem = impor(
 
 const ssh = impor('./models/ssh') as typeof import('./models/ssh');
 
-const serialport = impor(
-  './models/serialport'
-) as typeof import('./models/serialport');
+// const serialport = impor(
+//   './models/serialport'
+// ) as typeof import('./models/serialport');
 
 export function activate(context: vscode.ExtensionContext) {
   const fsListVolume = vscode.commands.registerCommand(
@@ -24,6 +24,20 @@ export function activate(context: vscode.ExtensionContext) {
     'iotcube.fsCopyFile',
     async (sourcePath: string, targetPath: string) => {
       return filesystem.FileSystem.copyFile(sourcePath, targetPath);
+    }
+  );
+
+  const fsTransferFile = vscode.commands.registerCommand(
+    'iotcube.fsTransferFile',
+    (targetPath: string) => {
+      return filesystem.FileSystem.transferFile(targetPath);
+    }
+  );
+
+  const fsGetTempDir = vscode.commands.registerCommand(
+    'iotcube.fsGetTempDir',
+    async () => {
+      return filesystem.FileSystem.getTempDir();
     }
   );
 
@@ -93,58 +107,60 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const serialportOpen = vscode.commands.registerCommand(
-    'iotcube.serialpoartOpen',
-    (port: string, baudRate: number, callbackCommand: string) => {
-      const conn = serialport.SerialPort.open(port, baudRate);
-      conn.on('opened', () => {
-        try {
-          vscode.commands.executeCommand(callbackCommand, 'opened');
-        } catch (ignore) {}
-      });
+  // const serialportOpen = vscode.commands.registerCommand(
+  //   'iotcube.serialpoartOpen',
+  //   (port: string, baudRate: number, callbackCommand: string) => {
+  //     const conn = serialport.SerialPort.open(port, baudRate);
+  //     conn.on('opened', () => {
+  //       try {
+  //         vscode.commands.executeCommand(callbackCommand, 'opened');
+  //       } catch (ignore) {}
+  //     });
 
-      conn.on('data', (chunk: string) => {
-        try {
-          vscode.commands.executeCommand(callbackCommand, 'data', chunk);
-        } catch (ignore) {}
-      });
+  //     conn.on('data', (chunk: string) => {
+  //       try {
+  //         vscode.commands.executeCommand(callbackCommand, 'data', chunk);
+  //       } catch (ignore) {}
+  //     });
 
-      conn.on('error', (error: Error) => {
-        try {
-          vscode.commands.executeCommand(callbackCommand, 'error', error);
-        } catch (ignore) {}
-      });
+  //     conn.on('error', (error: Error) => {
+  //       try {
+  //         vscode.commands.executeCommand(callbackCommand, 'error', error);
+  //       } catch (ignore) {}
+  //     });
 
-      conn.on('closed', () => {
-        try {
-          vscode.commands.executeCommand(callbackCommand, 'closed');
-        } catch (ignore) {}
-      });
+  //     conn.on('closed', () => {
+  //       try {
+  //         vscode.commands.executeCommand(callbackCommand, 'closed');
+  //       } catch (ignore) {}
+  //     });
 
-      conn.on('drain', () => {
-        try {
-          vscode.commands.executeCommand(callbackCommand, 'drain');
-        } catch (ignore) {}
-      });
-    }
-  );
+  //     conn.on('drain', () => {
+  //       try {
+  //         vscode.commands.executeCommand(callbackCommand, 'drain');
+  //       } catch (ignore) {}
+  //     });
+  //   }
+  // );
 
-  const serialportSend = vscode.commands.registerCommand(
-    'iotcube.serialportSend',
-    async (port: string, payload: string) => {
-      serialport.SerialPort.send(port, payload);
-    }
-  );
+  // const serialportSend = vscode.commands.registerCommand(
+  //   'iotcube.serialportSend',
+  //   async (port: string, payload: string) => {
+  //     serialport.SerialPort.send(port, payload);
+  //   }
+  // );
 
-  const serialportClose = vscode.commands.registerCommand(
-    'iotcube.serialportClose',
-    async (port: string) => {
-      serialport.SerialPort.close(port);
-    }
-  );
+  // const serialportClose = vscode.commands.registerCommand(
+  //   'iotcube.serialportClose',
+  //   async (port: string) => {
+  //     serialport.SerialPort.close(port);
+  //   }
+  // );
 
   context.subscriptions.push(fsListVolume);
   context.subscriptions.push(fsCopyFile);
+  context.subscriptions.push(fsTransferFile);
+  context.subscriptions.push(fsGetTempDir);
   context.subscriptions.push(sshDiscover);
   context.subscriptions.push(sshOpen);
   context.subscriptions.push(sshClose);
@@ -152,9 +168,9 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(sshExec);
   context.subscriptions.push(sshUploadFile);
   context.subscriptions.push(sshUploadFolder);
-  context.subscriptions.push(serialportOpen);
-  context.subscriptions.push(serialportSend);
-  context.subscriptions.push(serialportClose);
+  // context.subscriptions.push(serialportOpen);
+  // context.subscriptions.push(serialportSend);
+  // context.subscriptions.push(serialportClose);
 }
 
 export function deactivate() {}
