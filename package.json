@@ -15,6 +15,7 @@
     "*"
   ],
   "main": "./out/src/extension.js",
+  "api":"none",
   "scripts": {
     "vscode:prepublish": "npm run compile && webpack --mode production",
     "compile": "tsc -p .",
@@ -32,6 +33,7 @@
     "@types/fs-plus": "^3.0.1",
     "@types/mocha": "^2.2.42",
     "@types/node": "^10.12.21",
+    "@types/serialport": "^7.0.3",
     "@types/ssh2": "^0.5.38",
     "fs-plus": "^3.1.1",
     "gts": "^1.0.0",
@@ -44,6 +46,7 @@
   "dependencies": {
     "impor": "^0.1.1",
     "molehole": "^0.1.3",
+    "serialport": "^7.1.5",
     "ssh2": "^0.8.4",
     "volumelist": "^0.1.8"
   }
