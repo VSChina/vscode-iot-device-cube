@@ -42,6 +42,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const fsFileExists = vscode.commands.registerCommand(
+    'iotcube.fsFileExists',
+    async (localPath: string) => {
+      return filesystem.FileSystem.fileExists(localPath);
+    }
+  );
+
   const sshDiscover = vscode.commands.registerCommand(
     'iotcube.sshDiscover',
     async () => {
@@ -177,6 +184,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(fsCopyFile);
   context.subscriptions.push(fsTransferFile);
   context.subscriptions.push(fsGetTempDir);
+  context.subscriptions.push(fsFileExists);
   context.subscriptions.push(sshDiscover);
   context.subscriptions.push(sshOpen);
   context.subscriptions.push(sshClose);

@@ -33,6 +33,19 @@ export class FileSystem {
     return transferCallbackCommandName;
   }
 
+  static async fileExists(localPath: string) {
+    return new Promise((resolve: (exist: boolean) => void) => {
+      fs.stat(localPath, (error: Error | null) => {
+        if (error) {
+          resolve(false);
+          return;
+        }
+        resolve(true);
+        return;
+      });
+    });
+  }
+
   static async getTempDir() {
     return new Promise(
       (resolve: (folder: string) => void, reject: (error: Error) => void) => {
