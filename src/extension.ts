@@ -1,6 +1,7 @@
 const impor = require('impor')(__dirname);
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 const filesystem = impor(
   './models/filesystem'
@@ -157,6 +158,21 @@ export function activate(context: vscode.ExtensionContext) {
   //   }
   // );
 
+  const openInContainer = vscode.commands.registerCommand(
+    'iotcube.openInContainer',
+    async (localPath: string) => {
+      const containerPath = `/workspaces/${path.basename(localPath)}`;
+      const uri = vscode.Uri.parse(
+        `vscode-remote://dev-container+${Buffer.from(
+          localPath,
+          'utf8'
+        ).toString('hex')}${containerPath}`
+      );
+      await vscode.commands.executeCommand('vscode.openFolder', uri);
+      return;
+    }
+  );
+
   context.subscriptions.push(fsListVolume);
   context.subscriptions.push(fsCopyFile);
   context.subscriptions.push(fsTransferFile);
@@ -171,6 +187,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(serialportOpen);
   // context.subscriptions.push(serialportSend);
   // context.subscriptions.push(serialportClose);
+  context.subscriptions.push(openInContainer);
 }
 
 export function deactivate() {}
