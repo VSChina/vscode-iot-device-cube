@@ -180,6 +180,23 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const localRequire = vscode.commands.registerCommand(
+    'iotcube.localRequire',
+    // tslint:disable-next-line:no-any
+    async (modId: string, memeber: string, args?: any[]) => {
+      const m = await import(modId);
+      if (args) {
+        const res = await m[memeber].call(null, args);
+        const type = typeof res;
+        return JSON.stringify({ type, res });
+      } else {
+        const res = m[memeber];
+        const type = typeof res;
+        return JSON.stringify({ type, res });
+      }
+    }
+  );
+
   context.subscriptions.push(fsListVolume);
   context.subscriptions.push(fsCopyFile);
   context.subscriptions.push(fsTransferFile);
@@ -196,6 +213,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(serialportSend);
   // context.subscriptions.push(serialportClose);
   context.subscriptions.push(openInContainer);
+  context.subscriptions.push(localRequire);
 }
 
 export function deactivate() {}
