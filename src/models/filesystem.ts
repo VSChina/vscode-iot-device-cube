@@ -54,7 +54,8 @@ export class FileSystem {
           return;
         }
 
-        return stat.isDirectory();
+        resolve(stat.isDirectory());
+        return;
       });
     });
   }
@@ -67,7 +68,8 @@ export class FileSystem {
           return;
         }
 
-        return stat.isFile();
+        resolve(stat.isFile());
+        return;
       });
     });
   }
