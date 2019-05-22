@@ -42,10 +42,31 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const fsFileExists = vscode.commands.registerCommand(
-    'iotcube.fsFileExists',
+  const fsExists = vscode.commands.registerCommand(
+    'iotcube.fsExists',
     async (localPath: string) => {
-      return filesystem.FileSystem.fileExists(localPath);
+      return filesystem.FileSystem.exists(localPath);
+    }
+  );
+
+  const fsIsDirectory = vscode.commands.registerCommand(
+    'iotcube.fsIsDirectory',
+    async (localPath: string) => {
+      return filesystem.FileSystem.isDirectory(localPath);
+    }
+  );
+
+  const fsIsFile = vscode.commands.registerCommand(
+    'iotcube.fsIsFile',
+    async (localPath: string) => {
+      return filesystem.FileSystem.isFile(localPath);
+    }
+  );
+
+  const fsMkDir = vscode.commands.registerCommand(
+    'iotcube.fsMkDir',
+    async (localPath: string) => {
+      return filesystem.FileSystem.mkDir(localPath);
     }
   );
 
@@ -201,7 +222,10 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(fsCopyFile);
   context.subscriptions.push(fsTransferFile);
   context.subscriptions.push(fsGetTempDir);
-  context.subscriptions.push(fsFileExists);
+  context.subscriptions.push(fsExists);
+  context.subscriptions.push(fsIsDirectory);
+  context.subscriptions.push(fsIsFile);
+  context.subscriptions.push(fsMkDir);
   context.subscriptions.push(sshDiscover);
   context.subscriptions.push(sshOpen);
   context.subscriptions.push(sshClose);

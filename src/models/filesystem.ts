@@ -33,7 +33,7 @@ export class FileSystem {
     return transferCallbackCommandName;
   }
 
-  static async fileExists(localPath: string) {
+  static async exists(localPath: string) {
     return new Promise((resolve: (exist: boolean) => void) => {
       fs.stat(localPath, (error: Error | null) => {
         if (error) {
@@ -44,6 +44,48 @@ export class FileSystem {
         return;
       });
     });
+  }
+
+  static async isDirectory(localPath: string) {
+    return new Promise((resolve: (isDirectory: boolean) => void) => {
+      fs.stat(localPath, (error: Error | null, stat: fs.Stats) => {
+        if (error) {
+          resolve(false);
+          return;
+        }
+
+        return stat.isDirectory();
+      });
+    });
+  }
+
+  static async isFile(localPath: string) {
+    return new Promise((resolve: (isDirectory: boolean) => void) => {
+      fs.stat(localPath, (error: Error | null, stat: fs.Stats) => {
+        if (error) {
+          resolve(false);
+          return;
+        }
+
+        return stat.isFile();
+      });
+    });
+  }
+
+  static async mkDir(localPath: string) {
+    return new Promise(
+      (resolve: (value: void) => void, reject: (error: Error) => void) => {
+        fs.mkdir(localPath, (error: Error | null) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve();
+          return;
+        });
+      }
+    );
   }
 
   static async getTempDir() {
