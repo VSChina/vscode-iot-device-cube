@@ -3,6 +3,7 @@ import * as ssh2 from 'ssh2';
 import { EventEmitter } from 'events';
 import { FSPromise as fs } from './fsPromise';
 import * as path from 'path';
+import { rejects } from 'assert';
 
 interface SSHClientList {
   total: number;
@@ -36,22 +37,28 @@ export class SSH {
     username: string,
     password: string
   ) {
-    return new Promise((resolve: (id: number) => void) => {
-      const client = new ssh2.Client();
-      client
-        .on('ready', () => {
-          SSH._clientList.clients[SSH._clientList.total] = client;
-          SSH._clientList.total++;
-          resolve(SSH._clientList.total - 1);
-          return;
-        })
-        .connect({
-          host,
-          port,
-          username,
-          password,
-        });
-    });
+    return new Promise(
+      (resolve: (id: number) => void, reject: (error: Error) => void) => {
+        const client = new ssh2.Client();
+        client
+          .on('ready', () => {
+            SSH._clientList.clients[SSH._clientList.total] = client;
+            SSH._clientList.total++;
+            resolve(SSH._clientList.total - 1);
+            return;
+          })
+          .on('error', (error: Error) => {
+            reject(error);
+            return;
+          })
+          .connect({
+            host,
+            port,
+            username,
+            password,
+          });
+      }
+    );
   }
 
   static close(id: number) {
