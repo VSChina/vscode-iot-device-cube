@@ -9,6 +9,31 @@ export class FileSystem {
     return vl.volumelistName();
   }
 
+  static async readFile(localPath: string, encoding?: string) {
+    return new Promise(
+      (
+        resolve: (data: string) => void,
+        reject: (reason: Error | null) => void
+      ) => {
+        fs.readFile(
+          localPath,
+          encoding,
+          (error: Error | null, data: string | Buffer) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            if (typeof data === 'string') {
+              data = Buffer.from(data);
+            }
+            resolve(data.toString('base64'));
+            return;
+          }
+        );
+      }
+    );
+  }
+
   static async copyFile(sourcePath: string, targetPath: string) {
     targetPath = path.join(targetPath, path.basename(sourcePath));
     fs.copyFile(sourcePath, targetPath, Promise.resolve);

@@ -21,6 +21,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const fsReadFile = vscode.commands.registerCommand(
+    'iotcube.fsReadFile',
+    async (localPath: string, encoding?: string) => {
+      return filesystem.FileSystem.readFile(localPath, encoding);
+    }
+  );
+
   const fsCopyFile = vscode.commands.registerCommand(
     'iotcube.fsCopyFile',
     async (sourcePath: string, targetPath: string) => {
@@ -219,6 +226,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(fsListVolume);
+  context.subscriptions.push(fsReadFile);
   context.subscriptions.push(fsCopyFile);
   context.subscriptions.push(fsTransferFile);
   context.subscriptions.push(fsGetTempDir);
