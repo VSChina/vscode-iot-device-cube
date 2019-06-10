@@ -2,9 +2,9 @@
   "name": "vscode-iot-device-cube",
   "displayName": "IoT Device Cube",
   "description": "Utility extension to access to physical devices",
-  "version": "0.0.1",
+  "version": "0.0.12",
   "extensionKind": "ui",
-  "publisher": "vsciot-vscode",
+  "publisher": "zlhe-test",
   "engines": {
     "vscode": "^1.33.0"
   },
@@ -15,6 +15,7 @@
     "*"
   ],
   "main": "./out/src/extension.js",
+  "api": "none",
   "scripts": {
     "vscode:prepublish": "npm run compile && webpack --mode production",
     "compile": "tsc -p .",
@@ -32,6 +33,7 @@
     "@types/fs-plus": "^3.0.1",
     "@types/mocha": "^2.2.42",
     "@types/node": "^10.12.21",
+    "@types/serialport": "^7.0.3",
     "@types/ssh2": "^0.5.38",
     "fs-plus": "^3.1.1",
     "gts": "^1.0.0",

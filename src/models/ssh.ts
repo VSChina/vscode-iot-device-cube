@@ -3,6 +3,7 @@ import * as ssh2 from 'ssh2';
 import { EventEmitter } from 'events';
 import { FSPromise as fs } from './fsPromise';
 import * as path from 'path';
+import { rejects } from 'assert';
 
 interface SSHClientList {
   total: number;
@@ -36,22 +37,28 @@ export class SSH {
     username: string,
     password: string
   ) {
-    return new Promise((resolve: (id: number) => void) => {
-      const client = new ssh2.Client();
-      client
-        .on('ready', () => {
-          SSH._clientList.clients[SSH._clientList.total] = client;
-          SSH._clientList.total++;
-          resolve(SSH._clientList.total - 1);
-          return;
-        })
-        .connect({
-          host,
-          port,
-          username,
-          password,
-        });
-    });
+    return new Promise(
+      (resolve: (id: number) => void, reject: (error: Error) => void) => {
+        const client = new ssh2.Client();
+        client
+          .on('ready', () => {
+            SSH._clientList.clients[SSH._clientList.total] = client;
+            SSH._clientList.total++;
+            resolve(SSH._clientList.total - 1);
+            return;
+          })
+          .on('error', (error: Error) => {
+            reject(error);
+            return;
+          })
+          .connect({
+            host,
+            port,
+            username,
+            password,
+          });
+      }
+    );
   }
 
   static close(id: number) {
@@ -99,14 +106,42 @@ export class SSH {
           output += chunk;
         });
 
-        cmd.on('close', () => {
+        cmd.once('close', () => {
+          cmd.removeAllListeners();
           resolve(output);
           return;
         });
 
-        cmd.on('error', (error: Error) => {
+        cmd.once('error', (error: Error) => {
+          cmd.removeAllListeners();
           reject(error);
           return;
+        });
+      }
+    );
+  }
+
+  private static async ensureFolder(
+    sftp: ssh2.SFTPWrapper,
+    remotePath: string
+  ) {
+    return new Promise(
+      (resolve: (value: void) => void, reject: (error: Error) => void) => {
+        sftp.readdir(remotePath, (error: Error) => {
+          if (error) {
+            sftp.mkdir(remotePath, (error: Error) => {
+              if (error) {
+                reject(error);
+                return;
+              }
+
+              resolve();
+              return;
+            });
+          } else {
+            resolve();
+            return;
+          }
         });
       }
     );
@@ -134,8 +169,8 @@ export class SSH {
             path.basename(localPath)
           );
           remotePath = remotePath.replace(/[\/\\]+/g, '/');
-          await SSH.exec(id, `mkdir -p ${remoteFolderPath}`);
 
+          await SSH.ensureFolder(sftp, remoteFolderPath);
           sftp.fastPut(localPath, remotePath, (error: Error) => {
             if (error) {
               reject(error);
