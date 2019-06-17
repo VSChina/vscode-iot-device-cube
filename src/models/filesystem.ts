@@ -40,19 +40,32 @@ export class FileSystem {
   }
 
   static async transferFile(targetPath: string) {
-    const stream = fs.createWriteStream(targetPath);
+    // const stream = fs.createWriteStream(targetPath);
+    let buffer = Buffer.from([]);
     const transferCallbackCommandName = `iotcube.transferfile${new Date().getTime()}_${Math.round(
       Math.random() * 100
     )}`;
     const transferCallback = vscode.commands.registerCommand(
       transferCallbackCommandName,
       async (base64Data: string) => {
-        if (base64Data === 'EOF') {
-          stream.end();
-          transferCallback.dispose();
-        } else {
-          stream.write(base64Data, 'base64');
-        }
+        return new Promise((resolve: (value: void) => void,
+        reject: (reason: Error) => void) => {
+          if (base64Data === 'EOF') {
+            transferCallback.dispose();
+            // stream.end(Promise.resolve);
+            fs.writeFile(targetPath, buffer, 'binary', (error) => {
+              if (error) {
+                reject(error);
+                return;
+              }
+              resolve();
+            });
+          } else {
+            // stream.write(base64Data, 'base64', Promise.resolve);
+            buffer = Buffer.concat([buffer, Buffer.from(base64Data, 'base64')]);
+            resolve();
+          }
+        });
       }
     );
     return transferCallbackCommandName;
