@@ -212,6 +212,18 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const openLocally = vscode.commands.registerCommand(
+    'iotcube.openLocally',
+    async (localPath: string, openInNewWindow = false) => {
+      await vscode.commands.executeCommand(
+        'vscode.openFolder',
+        vscode.Uri.file(localPath),
+        openInNewWindow
+      );
+      return;
+    }
+  );
+
   const localRequire = vscode.commands.registerCommand(
     'iotcube.localRequire',
     // tslint:disable-next-line:no-any
@@ -256,6 +268,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(serialportSend);
   // context.subscriptions.push(serialportClose);
   context.subscriptions.push(openInContainer);
+  context.subscriptions.push(openLocally);
   context.subscriptions.push(localRequire);
   context.subscriptions.push(clipboardCopy);
 }
