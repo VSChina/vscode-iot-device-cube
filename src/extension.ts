@@ -9,6 +9,10 @@ const filesystem = impor(
 
 const ssh = impor('./models/ssh') as typeof import('./models/ssh');
 
+const clipboard = impor(
+  './models/clipboard'
+) as typeof import('./models/clipboard');
+
 // const serialport = impor(
 //   './models/serialport'
 // ) as typeof import('./models/serialport');
@@ -225,6 +229,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const clipboardCopy = vscode.commands.registerCommand(
+    'iotcube.clipboardCopy',
+    (text: string) => {
+      clipboard.Clipboard.copy(text);
+    }
+  );
+
   context.subscriptions.push(fsListVolume);
   context.subscriptions.push(fsReadFile);
   context.subscriptions.push(fsCopyFile);
@@ -246,6 +257,7 @@ export function activate(context: vscode.ExtensionContext) {
   // context.subscriptions.push(serialportClose);
   context.subscriptions.push(openInContainer);
   context.subscriptions.push(localRequire);
+  context.subscriptions.push(clipboardCopy);
 }
 
 export function deactivate() {}
