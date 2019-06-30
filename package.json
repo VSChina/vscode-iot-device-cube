@@ -2,7 +2,7 @@
   "name": "vscode-iot-device-cube",
   "displayName": "IoT Device Cube",
   "description": "Utility extension to access to physical devices",
-  "version": "0.0.13",
+  "version": "0.0.22",
   "extensionKind": "ui",
   "publisher": "zlhe-test",
   "engines": {
@@ -30,6 +30,7 @@
     "posttest": "npm run check"
   },
   "devDependencies": {
+    "@types/copy-paste": "^1.1.30",
     "@types/fs-plus": "^3.0.1",
     "@types/mocha": "^2.2.42",
     "@types/node": "^10.12.21",
