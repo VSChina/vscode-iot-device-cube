@@ -40,6 +40,7 @@
     "posttest": "npm run check"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.4.32",
     "@types/copy-paste": "^1.1.30",
     "@types/fs-plus": "^3.0.1",
     "@types/mocha": "^2.2.42",
