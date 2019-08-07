@@ -3,8 +3,30 @@ import * as vl from 'volumelist';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+var adm_zip = require('adm-zip');
 
 export class FileSystem {
+  static async unzipFile(sourcePath: string, targetPath: string){
+    return new Promise(
+      (resolve: (value: void) => void, reject: (error: Error) => void) => {
+        try{
+          //extracting archives  
+          var unzip = new adm_zip(sourcePath);  
+          unzip.extractAllTo(targetPath, true);
+          //delete comopressed folder in local machine
+          fs.unlink(sourcePath, function(err) {
+            if (err) {
+              vscode.window.showWarningMessage("Failed to delete zip file on local machine");
+            }
+          });
+          resolve();
+        } catch(err){
+          reject(err);
+        }
+      }
+    );
+  }
+
   static async listVolume() {
     return vl.volumelistName();
   }

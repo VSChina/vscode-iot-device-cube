@@ -39,6 +39,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const fsUnzipFile = vscode.commands.registerCommand(
+    'iotcube.unzipFile',
+    (sourcePath: string, targetPath: string) => {
+      return filesystem.FileSystem.unzipFile(sourcePath, targetPath);
+    }
+  );
+
   const fsTransferFile = vscode.commands.registerCommand(
     'iotcube.fsTransferFile',
     (targetPath: string) => {
@@ -251,6 +258,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(fsListVolume);
   context.subscriptions.push(fsReadFile);
   context.subscriptions.push(fsCopyFile);
+  context.subscriptions.push(fsUnzipFile);
   context.subscriptions.push(fsTransferFile);
   context.subscriptions.push(fsGetTempDir);
   context.subscriptions.push(fsExists);
