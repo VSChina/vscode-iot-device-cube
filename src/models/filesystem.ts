@@ -3,26 +3,31 @@ import * as vl from 'volumelist';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import * as adm_zip from 'adm-zip';
+import * as util from 'util';
+import * as AdmZip from 'adm-zip';
 
 export class FileSystem {
   static async unzipFile(sourcePath: string, targetPath: string){
     return new Promise(
-      (resolve: (value: void) => void, reject: (error: Error) => void) => {
-        try{
-          //extracting archives  
-          const unzip = new adm_zip(sourcePath);  
-          unzip.extractAllToAsync(targetPath, true);
-          //delete comopressed folder in local machine
-          fs.unlink(sourcePath, function(err) {
-            if (err) {
-              vscode.window.showWarningMessage("Failed to delete zip file on local machine");
-            }
-          });
-          resolve();
-        } catch(err){
+      async (resolve: (value: void) => void, reject: (error: Error) => void) => {
+        try {
+          // Extract archives
+          const zip = new AdmZip(sourcePath);
+          const extractAllToAsyncPromisify = util.promisify(zip.extractAllToAsync);
+          await extractAllToAsyncPromisify(targetPath, true);
+        } catch (err) {
           reject(err);
+          return;
         }
+        try {
+          // Delete compressed folder on local machine.
+          const unlinkPromisify = util.promisify(fs.unlink);
+          await unlinkPromisify(sourcePath);
+        } catch (err) {
+          // This error does not affect folder-transfer so it does not invoke reject
+          console.log("Failed to delete compressed folder on local machine: " + err);
+        }
+        resolve();
       }
     );
   }
