@@ -1,10 +1,8 @@
 import * as vscode from 'vscode';
-import * as _ from 'lodash';
 import * as os from 'os';
-import {Board} from './Interfaces/Board';
 import {PortOption} from './Interfaces/PortOption';
 
-const serialport = require('../../vendor/node-usb-native').SerialPort;
+const SerialPort = require('../../vendor/node-usb-native').SerialPort;
 
 interface SerialPortInfo {
   comName: string;
@@ -20,70 +18,36 @@ export class SerialPortCtrl {
     return os.platform();
   }
 
-  static getComList(): Promise<SerialPortInfo[]> {
+  static async getComList() {
     return new Promise(
       (
-        resolve: (value: SerialPortInfo[]) => void,
+        resolve: (value: Object) => void,
         reject: (error: Error) => void
       ) => {
         // tslint:disable-next-line: no-any
-        serialport.list((err: any, ports: SerialPortInfo[]) => {
+        var portList: Array<Object> = [];
+        SerialPort.list((err: any, ports: SerialPortInfo[]) => {
           if (err) {
             reject(err);
           } else {
-            resolve(ports);
+            ports.forEach( async (port) => {
+              const com = {
+                "comName": port.comName,
+                "productId": port.productId,
+                "vendorId": port.vendorId
+              };
+              try {
+                await portList.push(com);
+              } catch (err) {
+                reject(err);
+              }
+            });
+            const portListJson = {
+              "portList": portList
+            }
+            resolve(portListJson);
           }
         });
-      }
-    );
-  }
-
-  static async chooseCOM(board: Board | undefined): Promise<string> {
-    return new Promise(
-      async (
-        resolve: (value: string) => void,
-        reject: (reason: Error) => void
-      ) => {
-        let comList;
-        try{
-          comList = await SerialPortCtrl.getComList();
-        } catch (err) {
-          return reject(err);
-        }
-
-        const az3166 = board;
-
-        if (!az3166) {
-          return reject(new Error('AZ3166 is not found in the board list.'));
-        }
-
-        const list = _.filter(comList, com => {
-          if (com.vendorId && com.productId && az3166.vendorId &&
-            az3166.productId &&
-            com.vendorId.toLowerCase().endsWith(az3166.vendorId) &&
-            com.productId.toLowerCase().endsWith(az3166.productId)) {
-            return true;
-          } else {
-            return false;
-          }
-        });
-
-        if (list && list.length) {
-          let comPort = list[0].comName;
-          if (list.length > 1) {
-            // TODO: select com port from list when there are multiple AZ3166
-            // boards connected
-            comPort = list[0].comName;
-          }
-
-          if (!comPort) {
-            reject(new Error('No avalible COM port.'));
-          }
-
-          resolve(comPort);
-        } else {
-          reject(new Error('No AZ3166 board connected.'));
-        }
       }
     );
   }
@@ -94,7 +58,7 @@ export class SerialPortCtrl {
       monitorCallbackCommandName = await vscode.commands.executeCommand(
         'iotworkbench.getMonitorCallbackCommandName'
       ) as string;
-      SerialPortCtrl._port = await new serialport(comPort, option);
+      SerialPortCtrl._port = await new SerialPort(comPort, option);
     } catch (err) {
       throw err;
     }

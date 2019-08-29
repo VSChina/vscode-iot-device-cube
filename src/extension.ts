@@ -2,7 +2,6 @@ const impor = require('impor')(__dirname);
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import {Board} from './models/Interfaces/Board';
 import {PortOption} from './models/Interfaces/PortOption';
 
 const filesystem = impor(
@@ -52,10 +51,10 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const serialportChooseCOM = vscode.commands.registerCommand(
-    'iotcube.serialportChooseCOM',
-    async (board: Board | undefined) => {
-      return serialport.SerialPortCtrl.chooseCOM(board);
+  const serialportGetComList = vscode.commands.registerCommand(
+    'iotcube.serialportGetComList',
+    async () => {
+      return serialport.SerialPortCtrl.getComList();
     }
   );
 
@@ -300,7 +299,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(serialportClose);
   context.subscriptions.push(serialportSend);
   context.subscriptions.push(serialportOpen);
-  context.subscriptions.push(serialportChooseCOM);
+  context.subscriptions.push(serialportGetComList);
   context.subscriptions.push(fsListVolume);
   context.subscriptions.push(fsReadFile);
   context.subscriptions.push(fsCopyFile);
