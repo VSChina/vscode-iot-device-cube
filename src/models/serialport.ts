@@ -51,7 +51,7 @@ export class SerialPort {
           reject(error);
           return;
         }
-        SerialPort._port.write(payload, (error?: Error) => {
+        SerialPort._port.write(payload, (error: Error | null | undefined, bytesWritten: number) => {
           if (error) {
             reject(error);
             return;
