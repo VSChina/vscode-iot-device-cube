@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import * as os from 'os';
 import {PortOption} from './Interfaces/PortOption';
-import {PortListJson} from './Interfaces/PortListJson';
-import {ComPort} from './Interfaces/PortListJson';
+import {ComPort, PortListJson} from './Interfaces/PortListJson';
 
 const SerialPort = require('../../vendor/node-usb-native').SerialPort;
 
