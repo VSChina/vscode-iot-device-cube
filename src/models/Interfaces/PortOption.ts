@@ -1,5 +1,5 @@
 export interface PortOption {
-    baudRate?: number | undefined;
+    baudRate?: number;
     dataBits?: number;
     stopBits?: number;
     xon?: boolean;

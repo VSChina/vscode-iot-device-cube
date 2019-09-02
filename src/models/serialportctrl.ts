@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
 import * as os from 'os';
 import {PortOption} from './Interfaces/PortOption';
+import {PortListJson} from './Interfaces/PortListJson';
+import {ComPort} from './Interfaces/PortListJson';
 
 const SerialPort = require('../../vendor/node-usb-native').SerialPort;
 
 interface SerialPortInfo {
   comName: string;
   manufacturer: string;
-  vendorId: string;
-  productId: string;
+  vendorId?: string;
+  productId?: string;
 }
 
 export class SerialPortCtrl {
@@ -18,29 +20,25 @@ export class SerialPortCtrl {
     return os.platform();
   }
 
-  static async getComList() {
+  static async getComList(): Promise<PortListJson> {
     return new Promise(
       (
-        resolve: (value: Object) => void,
+        resolve: (value: PortListJson) => void,
         reject: (error: Error) => void
       ) => {
         // tslint:disable-next-line: no-any
-        var portList: Array<Object> = [];
+        var portList: ComPort[] = [];
         SerialPort.list((err: any, ports: SerialPortInfo[]) => {
           if (err) {
             reject(err);
           } else {
-            ports.forEach( async (port) => {
-              const com = {
+            ports.forEach( (port) => {
+              const com: ComPort = {
                 "comName": port.comName,
                 "productId": port.productId,
                 "vendorId": port.vendorId
               };
-              try {
-                await portList.push(com);
-              } catch (err) {
-                reject(err);
-              }
+              portList.push(com);
             });
             const portListJson = {
               "portList": portList
