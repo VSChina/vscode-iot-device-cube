@@ -2,6 +2,7 @@ const impor = require('impor')(__dirname);
 
 import * as vscode from 'vscode';
 import * as path from 'path';
+import {PortOption} from './models/Interfaces/PortOption';
 
 const filesystem = impor(
   './models/filesystem'
@@ -13,11 +14,50 @@ const clipboard = impor(
   './models/clipboard'
 ) as typeof import('./models/clipboard');
 
+const serialport = impor(
+  './models/serialportctrl'
+) as typeof import('./models/serialportctrl');
+
 // const serialport = impor(
 //   './models/serialport'
 // ) as typeof import('./models/serialport');
 
 export function activate(context: vscode.ExtensionContext) {
+  const serialportGetPlatform = vscode.commands.registerCommand(
+    'iotcube.serialportGetPlatform',
+    () => {
+      return serialport.SerialPortCtrl.getPlatform();
+    }
+  );
+
+  const serialportClose = vscode.commands.registerCommand(
+    'iotcube.serialportClose',
+    () => {
+      return serialport.SerialPortCtrl.close();
+    }
+  );
+
+  const serialportSend = vscode.commands.registerCommand(
+    'iotcube.serialportSend',
+    (payload: string) => {
+      return serialport.SerialPortCtrl.send(payload);
+    }
+  );
+
+  const serialportOpen = vscode.commands.registerCommand(
+    'iotcube.serialportOpen',
+    (comPort: string, option: PortOption) => {
+      return serialport.SerialPortCtrl.open(comPort, option);
+    }
+  );
+
+  const serialportGetComList = vscode.commands.registerCommand(
+    'iotcube.serialportGetComList',
+    async () => {
+      return serialport.SerialPortCtrl.getComList();
+    }
+  );
+
   const fsListVolume = vscode.commands.registerCommand(
     'iotcube.fsListVolume',
     async () => {
@@ -255,6 +295,11 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  context.subscriptions.push(serialportGetPlatform);
+  context.subscriptions.push(serialportClose);
+  context.subscriptions.push(serialportSend);
+  context.subscriptions.push(serialportOpen);
+  context.subscriptions.push(serialportGetComList);
   context.subscriptions.push(fsListVolume);
   context.subscriptions.push(fsReadFile);
   context.subscriptions.push(fsCopyFile);
