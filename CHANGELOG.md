@@ -6,9 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Version 0.1.2
 
-- Add command to unzip files
+### Added
+By coorperating with Azure IoT Device Workbench's dependency [vscode-iot-device-cube-sdk (version 0.0.21)](https://www.npmjs.com/package/vscode-iot-device-cube-sdk), IoT Device Cube extension now is able to help Azure IoT Device Workbench extension to upload folder from container to device such as Raspberry Pi, and to config DevKit in a container. Related changes are listed as follows.
 
-- Add command to control serialports
+- Add command 'iotcube.unzipFile' to unzip a folder
+
+- Add class of 'SerialPortCtrl' to control serialports on local machine
 
 ## Version 0.1.1
 
