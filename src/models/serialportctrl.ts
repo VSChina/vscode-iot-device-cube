@@ -12,7 +12,9 @@ interface SerialPortInfo {
   productId?: string;
 }
 
-// control serialports on local machine
+/**
+ * Control serialports on host machine.
+ */
 export class SerialPortCtrl {
   private static _port: any;
 
@@ -20,7 +22,9 @@ export class SerialPortCtrl {
     return os.platform();
   }
 
-  // get serialport list
+  /**
+   * Get serialport list.
+   */
   static async getComList(): Promise<PortListJson> {
     return new Promise(
       (
@@ -51,7 +55,11 @@ export class SerialPortCtrl {
     );
   }
 
-  // comPort: name of serialport; option: option of opening a serialport
+  /**
+   * Open a serialport and listen to its events.
+   * @param comPort name of serialport.
+   * @param option option of opening a serialport.
+   */
   static async open(comPort: string, option: PortOption) {
     let monitorCallbackCommandName: string;
     try {
@@ -104,8 +112,10 @@ export class SerialPortCtrl {
     });
   }
 
-  // write data to serialport.
-  // payload: data to write
+  /**
+   * Write data to serialport.
+   * @param payload data to write.
+   */
   static send(payload: string) {
     return new Promise(
       (

@@ -7,8 +7,11 @@ import * as util from 'util';
 import * as AdmZip from 'adm-zip';
 
 export class FileSystem {
-  // sourcePath: path of folder to unzip
-  // targetPath: path to save the generated uncompressed folder
+  /**
+   * Unzip file.
+   * @param sourcePath path of folder to unzip.
+   * @param targetPath path to save the generated uncompressed folder.
+   */
   static async unzipFile(sourcePath: string, targetPath: string){
     return new Promise(
       async (resolve: (value: void) => void, reject: (error: Error) => void) => {
@@ -34,8 +37,10 @@ export class FileSystem {
     );
   }
 
-  // Get an array of volumes (path, name) on local machine
-  // Sample volume: Path "C:", name "OSDisk"
+  /**
+   * Get an array of volumes (path, name) on host machine. 
+   * Sample volume: Path "C:", name "OSDisk".
+   */
   static async listVolume() {
     return vl.volumelistName();
   }
