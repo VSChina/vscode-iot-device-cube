@@ -18,10 +18,6 @@ const serialport = impor(
   './models/serialportctrl'
 ) as typeof import('./models/serialportctrl');
 
-// const serialport = impor(
-//   './models/serialport'
-// ) as typeof import('./models/serialport');
-
 export function activate(context: vscode.ExtensionContext) {
   const serialportGetPlatform = vscode.commands.registerCommand(
     'iotcube.serialportGetPlatform',
@@ -194,56 +190,6 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // const serialportOpen = vscode.commands.registerCommand(
-  //   'iotcube.serialpoartOpen',
-  //   (port: string, baudRate: number, callbackCommand: string) => {
-  //     const conn = serialport.SerialPort.open(port, baudRate);
-  //     conn.on('opened', () => {
-  //       try {
-  //         vscode.commands.executeCommand(callbackCommand, 'opened');
-  //       } catch (ignore) {}
-  //     });
-
-  //     conn.on('data', (chunk: string) => {
-  //       try {
-  //         vscode.commands.executeCommand(callbackCommand, 'data', chunk);
-  //       } catch (ignore) {}
-  //     });
-
-  //     conn.on('error', (error: Error) => {
-  //       try {
-  //         vscode.commands.executeCommand(callbackCommand, 'error', error);
-  //       } catch (ignore) {}
-  //     });
-
-  //     conn.on('closed', () => {
-  //       try {
-  //         vscode.commands.executeCommand(callbackCommand, 'closed');
-  //       } catch (ignore) {}
-  //     });
-
-  //     conn.on('drain', () => {
-  //       try {
-  //         vscode.commands.executeCommand(callbackCommand, 'drain');
-  //       } catch (ignore) {}
-  //     });
-  //   }
-  // );
-
-  // const serialportSend = vscode.commands.registerCommand(
-  //   'iotcube.serialportSend',
-  //   async (port: string, payload: string) => {
-  //     serialport.SerialPort.send(port, payload);
-  //   }
-  // );
-
-  // const serialportClose = vscode.commands.registerCommand(
-  //   'iotcube.serialportClose',
-  //   async (port: string) => {
-  //     serialport.SerialPort.close(port);
-  //   }
-  // );
-
   const openInContainer = vscode.commands.registerCommand(
     'iotcube.openInContainer',
     async (localPath: string) => {
@@ -317,9 +263,6 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(sshExec);
   context.subscriptions.push(sshUploadFile);
   context.subscriptions.push(sshUploadFolder);
-  // context.subscriptions.push(serialportOpen);
-  // context.subscriptions.push(serialportSend);
-  // context.subscriptions.push(serialportClose);
   context.subscriptions.push(openInContainer);
   context.subscriptions.push(openLocally);
   context.subscriptions.push(localRequire);
