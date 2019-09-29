@@ -207,6 +207,8 @@ export class SSH {
           }
 
           const client = SSH._getClient(id);
+
+          // Clean and create the target path if not exists.
           const cmd = `rm -rf ${targetPath} && mkdir -p ${targetPath}`;
           client.exec(cmd, (err: Error, channel: ssh2.ClientChannel) => {});
 
@@ -226,9 +228,6 @@ export class SSH {
                 localFolderPath.length
               );
               let remoteFolderPath = path.join(targetPath, relativePath);
-              console.log(
-                `### local file ${filePath} will be transfer to remote path ${remoteFolderPath}`
-              );
 
               remoteFolderPath = remoteFolderPath
                 .replace(/[\/\\]+/g, '/')
