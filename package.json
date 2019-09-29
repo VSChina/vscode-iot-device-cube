@@ -44,16 +44,16 @@
     "@types/copy-paste": "^1.1.30",
     "@types/fs-plus": "^3.0.1",
     "@types/mocha": "^2.2.42",
-    "@types/node": "^10.14.16",
+    "@types/node": "^10.14.19",
     "@types/serialport": "^7.0.4",
-    "@types/ssh2": "^0.5.38",
+    "@types/ssh2": "^0.5.39",
     "fs-plus": "^3.1.1",
     "gts": "^1.1.0",
-    "tslint": "^5.19.0",
+    "tslint": "^5.20.0",
     "typescript": "~3.4.0",
     "vscode": "^1.1.36",
-    "webpack": "^4.39.2",
-    "webpack-cli": "^3.3.7"
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
   },
   "dependencies": {
     "adm-zip": "^0.4.13",

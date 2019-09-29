@@ -12,13 +12,18 @@ export class FileSystem {
    * @param sourcePath path of folder to unzip.
    * @param targetPath path to save the generated uncompressed folder.
    */
-  static async unzipFile(sourcePath: string, targetPath: string){
+  static async unzipFile(sourcePath: string, targetPath: string) {
     return new Promise(
-      async (resolve: (value: void) => void, reject: (error: Error) => void) => {
+      async (
+        resolve: (value: void) => void,
+        reject: (error: Error) => void
+      ) => {
         try {
           // Extract archives
           const zip = new AdmZip(sourcePath);
-          const extractAllToAsyncPromisify = util.promisify(zip.extractAllToAsync);
+          const extractAllToAsyncPromisify = util.promisify(
+            zip.extractAllToAsync
+          );
           await extractAllToAsyncPromisify(targetPath, true);
         } catch (err) {
           reject(err);
@@ -30,7 +35,9 @@ export class FileSystem {
           await unlinkPromisify(sourcePath);
         } catch (err) {
           // This error does not affect folder-transfer so it does not invoke reject
-          console.log("Failed to delete compressed folder on local machine: " + err);
+          console.log(
+            'Failed to delete compressed folder on local machine: ' + err
+          );
         }
         resolve();
       }
@@ -38,7 +45,7 @@ export class FileSystem {
   }
 
   /**
-   * Get an array of volumes (path, name) on host machine. 
+   * Get an array of volumes (path, name) on host machine.
    * Sample volume: Path "C:", name "OSDisk".
    */
   static async listVolume() {
