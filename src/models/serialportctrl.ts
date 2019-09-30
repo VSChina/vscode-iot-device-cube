@@ -68,6 +68,11 @@ export class SerialPortCtrl {
       monitorCallbackCommandName = (await vscode.commands.executeCommand(
         'iotworkbench.getMonitorCallbackCommandName'
       )) as string;
+      if (!monitorCallbackCommandName) {
+        throw new Error(
+          `Fail to get iot workbench monitor callback command name`
+        );
+      }
       SerialPortCtrl._port = await new SerialPort(comPort, option);
     } catch (err) {
       throw err;
