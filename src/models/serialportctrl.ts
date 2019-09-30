@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as os from 'os';
-import {PortOption} from './Interfaces/PortOption';
-import {ComPort, PortListJson} from './Interfaces/PortListJson';
+import { PortOption } from './Interfaces/PortOption';
+import { ComPort, PortListJson } from './Interfaces/PortListJson';
 
 const SerialPort = require('../../vendor/node-usb-native').SerialPort;
 
@@ -16,6 +16,7 @@ interface SerialPortInfo {
  * Control serialports on host machine.
  */
 export class SerialPortCtrl {
+  // tslint:disable-next-line: no-any
   private static _port: any;
 
   static getPlatform() {
@@ -32,22 +33,23 @@ export class SerialPortCtrl {
         reject: (error: Error) => void
       ) => {
         // tslint:disable-next-line: no-any
-        var portList: ComPort[] = [];
+        const portList: ComPort[] = [];
+        // tslint:disable-next-line: no-any
         SerialPort.list((err: any, ports: SerialPortInfo[]) => {
           if (err) {
             reject(err);
           } else {
-            ports.forEach( (port) => {
+            ports.forEach(port => {
               const com: ComPort = {
-                "comName": port.comName,
-                "productId": port.productId,
-                "vendorId": port.vendorId
+                comName: port.comName,
+                productId: port.productId,
+                vendorId: port.vendorId,
               };
               portList.push(com);
             });
             const portListJson = {
-              "portList": portList
-            }
+              portList,
+            };
             resolve(portListJson);
           }
         });
@@ -63,28 +65,40 @@ export class SerialPortCtrl {
   static async open(comPort: string, option: PortOption) {
     let monitorCallbackCommandName: string;
     try {
-      monitorCallbackCommandName = await vscode.commands.executeCommand(
+      monitorCallbackCommandName = (await vscode.commands.executeCommand(
         'iotworkbench.getMonitorCallbackCommandName'
-      ) as string;
+      )) as string;
+      if (!monitorCallbackCommandName) {
+        throw new Error(
+          `Fail to get iot workbench monitor callback command name`
+        );
+      }
       SerialPortCtrl._port = await new SerialPort(comPort, option);
     } catch (err) {
       throw err;
     }
     const errorPlaceHolder = new Error();
-    const payloadPlaceHolder = "";
+    const payloadPlaceHolder = '';
     SerialPortCtrl._port.on('open', async () => {
       try {
         await vscode.commands.executeCommand(
-          monitorCallbackCommandName, 'open', payloadPlaceHolder, errorPlaceHolder.message
+          monitorCallbackCommandName,
+          'open',
+          payloadPlaceHolder,
+          errorPlaceHolder.message
         );
       } catch (err) {
         throw err;
       }
     });
+    // tslint:disable-next-line: no-any
     SerialPortCtrl._port.on('data', async (data: any) => {
       try {
         await vscode.commands.executeCommand(
-          monitorCallbackCommandName, 'data', data.toString(), errorPlaceHolder.message
+          monitorCallbackCommandName,
+          'data',
+          data.toString(),
+          errorPlaceHolder.message
         );
       } catch (err) {
         throw err;
@@ -93,7 +107,10 @@ export class SerialPortCtrl {
     SerialPortCtrl._port.on('error', async (err: Error) => {
       try {
         vscode.commands.executeCommand(
-          monitorCallbackCommandName, 'error', payloadPlaceHolder, err.message
+          monitorCallbackCommandName,
+          'error',
+          payloadPlaceHolder,
+          err.message
         );
       } catch (err) {
         throw err;
@@ -102,14 +119,16 @@ export class SerialPortCtrl {
     SerialPortCtrl._port.on('close', async () => {
       try {
         await vscode.commands.executeCommand(
-          monitorCallbackCommandName, 'close', payloadPlaceHolder, errorPlaceHolder.message
+          monitorCallbackCommandName,
+          'close',
+          payloadPlaceHolder,
+          errorPlaceHolder.message
         );
       } catch (err) {
         throw err;
       }
     });
-    SerialPortCtrl._port.on('drain', () => {
-    });
+    SerialPortCtrl._port.on('drain', () => {});
   }
 
   /**
@@ -118,10 +137,7 @@ export class SerialPortCtrl {
    */
   static send(payload: string) {
     return new Promise(
-      (
-        resolve: (value: void) => void, 
-        reject: (reason: Error) => void
-      ) => {
+      (resolve: (value: void) => void, reject: (reason: Error) => void) => {
         try {
           // tslint:disable-next-line: no-any
           SerialPortCtrl._port.write(payload, (err: any) => {
@@ -140,12 +156,9 @@ export class SerialPortCtrl {
 
   static close() {
     return new Promise(
-      (
-        resolve: (value: void) => void,
-        reject: (value: Error) => void
-      ) => {
+      (resolve: (value: void) => void, reject: (value: Error) => void) => {
         SerialPortCtrl._port.close((err: Error) => {
-          if(err){
+          if (err) {
             reject(err);
             return;
           }
@@ -154,5 +167,4 @@ export class SerialPortCtrl {
       }
     );
   }
-  
 }

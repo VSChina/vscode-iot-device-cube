@@ -3,7 +3,6 @@ import * as ssh2 from 'ssh2';
 import { EventEmitter } from 'events';
 import { FSPromise as fs } from './fsPromise';
 import * as path from 'path';
-import { rejects } from 'assert';
 
 interface SSHClientList {
   total: number;
@@ -147,11 +146,7 @@ export class SSH {
     );
   }
 
-  static async uploadFile(
-    id: number,
-    localPath: string,
-    remoteFolderPath: string
-  ) {
+  static async uploadFile(id: number, localPath: string, targetPath: string) {
     return new Promise(
       (resolve: (value: void) => void, reject: (reason: Error) => void) => {
         const client = SSH._getClient(id);
@@ -161,16 +156,15 @@ export class SSH {
             return;
           }
 
-          remoteFolderPath = remoteFolderPath
-            .replace(/[\/\\]+/g, '/')
+          targetPath = targetPath
+            .replace(/[\\]+/g, path.posix.sep)
             .replace(/\/$/, '');
-          let remotePath = path.join(
-            remoteFolderPath,
+          const remotePath = path.posix.join(
+            targetPath,
             path.basename(localPath)
           );
-          remotePath = remotePath.replace(/[\/\\]+/g, '/');
 
-          await SSH.ensureFolder(sftp, remoteFolderPath);
+          await SSH.ensureFolder(sftp, targetPath);
           sftp.fastPut(localPath, remotePath, (error: Error) => {
             if (error) {
               reject(error);
@@ -184,10 +178,17 @@ export class SSH {
     );
   }
 
+  /**
+   * Upload an entire folder from local file system to target machine through ssh.
+   * @param id SSH client connection id
+   * @param localFolderPath Folder path on local file system.
+   * @param targetPath Target folder path on target machine.
+   */
+
   static async uploadFolder(
     id: number,
     localFolderPath: string,
-    remoteFolderPath: string
+    targetPath: string
   ) {
     return new Promise(
       async (
@@ -195,23 +196,57 @@ export class SSH {
         reject: (reason: Error) => void
       ) => {
         try {
-          localFolderPath = localFolderPath.replace(/[\/\\]+/g, '/');
-          if (!/\/$/.test(localFolderPath)) {
-            localFolderPath += '/';
-          }
-          const files = await fs.listTree(localFolderPath);
-
-          for (const localPath of files) {
-            const fileFolderPath = path
-              .dirname(localPath)
-              .replace(/[\/\\]+/g, '/');
-            const relativePath = fileFolderPath.substr(localFolderPath.length);
-            const remotePath = path.join(remoteFolderPath, relativePath);
-            await SSH.uploadFile(id, localPath, remotePath);
+          // Normalize path seperator to posix style
+          localFolderPath = localFolderPath.replace(/[\\]+/g, path.posix.sep);
+          if (!localFolderPath.endsWith(path.posix.sep)) {
+            localFolderPath += path.posix.sep;
           }
 
-          resolve();
-          return;
+          const client = SSH._getClient(id);
+
+          // Clean and create the target path if not exists.
+          const cmd = `rm -rf ${targetPath} && mkdir -p ${targetPath}`;
+          client.exec(cmd, (err: Error, channel: ssh2.ClientChannel) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+            client.sftp(async (error: Error, sftp: ssh2.SFTPWrapper) => {
+              if (error) {
+                reject(error);
+                return;
+              }
+
+              const files = await fs.listTree(localFolderPath);
+
+              files.forEach(async (filePath, index) => {
+                filePath = filePath
+                  .replace(/[\\]+/g, path.posix.sep)
+                  .replace(/\/$/, '');
+                const relativePath = path.posix.relative(
+                  localFolderPath,
+                  filePath
+                );
+                const remotePath = path.posix.join(targetPath, relativePath);
+
+                const remoteFolderPath = path.posix.dirname(remotePath);
+                await SSH.ensureFolder(sftp, remoteFolderPath);
+
+                sftp.fastPut(filePath, remotePath, (error: Error) => {
+                  if (error) {
+                    reject(error);
+                    return;
+                  }
+                  if (index === files.length - 1) {
+                    sftp.end();
+
+                    resolve();
+                    return;
+                  }
+                });
+              });
+            });
+          });
         } catch (error) {
           reject(error);
           return;

@@ -2,7 +2,7 @@ const impor = require('impor')(__dirname);
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import {PortOption} from './models/Interfaces/PortOption';
+import { PortOption } from './models/Interfaces/PortOption';
 
 const filesystem = impor(
   './models/filesystem'
