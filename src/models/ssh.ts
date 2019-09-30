@@ -25,11 +25,21 @@ export class SSH {
     delete SSH._clientList.clients[id];
   }
 
+  /**
+   * Discovers devices in LAN
+   */
   static async discover() {
     const devices = MoleHole.getDevicesFromLAN();
     return devices;
   }
 
+  /**
+   * Attempts to connect to a server.
+   * @param host server ip
+   * @param port server ssh port
+   * @param username server username
+   * @param password server password
+   */
   static async open(
     host: string,
     port: number,
@@ -60,13 +70,22 @@ export class SSH {
     );
   }
 
+  /**
+   * Close ssh connection and release resource.
+   * @param id SSH connection id
+   */
   static close(id: number) {
     const client = SSH._getClient(id);
     client.end();
     SSH._removeClient(id);
   }
 
-  static spawn(id: number, command: string) {
+  /**
+   * Starts an interactive shell session on the server and execute a command
+   * @param id SSH connection id
+   * @param command command to execute on server
+   */
+  static spawn(id: number, command: string): EventEmitter {
     const event = new EventEmitter();
     const client = SSH._getClient(id);
     client.shell((error: Error, channel: ssh2.ClientChannel) => {
@@ -95,6 +114,11 @@ export class SSH {
     return event;
   }
 
+  /**
+   * Execute a command on server via a given ssh connection.
+   * @param id SSH connection id
+   * @param command Command to execute on server
+   */
   static async exec(id: number, command: string) {
     return new Promise(
       (resolve: (output: string) => void, reject: (reason: Error) => void) => {
@@ -120,6 +144,11 @@ export class SSH {
     );
   }
 
+  /**
+   * Ensure directory exists on server. Create one if not exists.
+   * @param sftp SFTP wrapper
+   * @param remotePath folder path on server
+   */
   private static async ensureFolder(
     sftp: ssh2.SFTPWrapper,
     remotePath: string
@@ -146,6 +175,12 @@ export class SSH {
     );
   }
 
+  /**
+   * Upload a file from local file system to server through ssh.
+   * @param id SSH connection id
+   * @param localPath File directory on local file system
+   * @param targetPath target folder path on server
+   */
   static async uploadFile(id: number, localPath: string, targetPath: string) {
     return new Promise(
       (resolve: (value: void) => void, reject: (reason: Error) => void) => {
@@ -179,10 +214,10 @@ export class SSH {
   }
 
   /**
-   * Upload an entire folder from local file system to target machine through ssh.
-   * @param id SSH client connection id
-   * @param localFolderPath Folder path on local file system.
-   * @param targetPath Target folder path on target machine.
+   * Upload a folder from local file system to server through ssh.
+   * @param id SSH connection id
+   * @param localFolderPath Folder path on local file system
+   * @param targetPath Target folder path on server
    */
 
   static async uploadFolder(
@@ -230,7 +265,12 @@ export class SSH {
                 const remotePath = path.posix.join(targetPath, relativePath);
 
                 const remoteFolderPath = path.posix.dirname(remotePath);
-                await SSH.ensureFolder(sftp, remoteFolderPath);
+                await SSH.ensureFolder(sftp, remoteFolderPath).catch(
+                  (error: Error) => {
+                    reject(error);
+                    return;
+                  }
+                );
 
                 sftp.fastPut(filePath, remotePath, (error: Error) => {
                   if (error) {
