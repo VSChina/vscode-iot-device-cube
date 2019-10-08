@@ -162,7 +162,6 @@ export class SSH {
                 reject(error);
                 return;
               }
-
               resolve();
               return;
             });
@@ -219,7 +218,6 @@ export class SSH {
    * @param localFolderPath Folder path on local file system
    * @param targetPath Target folder path on server
    */
-
   static async uploadFolder(
     id: number,
     localFolderPath: string,
@@ -254,7 +252,9 @@ export class SSH {
 
               const files = await fs.listTree(localFolderPath);
 
-              files.forEach(async (filePath, index) => {
+              for (let i = 0; i < files.length; i++) {
+                let filePath = files[i];
+
                 filePath = filePath
                   .replace(/[\\]+/g, path.posix.sep)
                   .replace(/\/$/, '');
@@ -277,14 +277,15 @@ export class SSH {
                     reject(error);
                     return;
                   }
-                  if (index === files.length - 1) {
+                  if (i === files.length - 1) {
                     sftp.end();
 
                     resolve();
+
                     return;
                   }
                 });
-              });
+              }
             });
           });
         } catch (error) {
