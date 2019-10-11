@@ -4,6 +4,12 @@ All notable changes to the "vscode-iot-device-cube" extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## Version 0.1.3
+
+### Fixed
+
+- Upload a folder from local file system to server through ssh.
+
 ## Version 0.1.2
 
 ### Added

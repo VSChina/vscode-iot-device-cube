@@ -162,7 +162,6 @@ export class SSH {
                 reject(error);
                 return;
               }
-
               resolve();
               return;
             });
@@ -219,7 +218,6 @@ export class SSH {
    * @param localFolderPath Folder path on local file system
    * @param targetPath Target folder path on server
    */
-
   static async uploadFolder(
     id: number,
     localFolderPath: string,
@@ -241,51 +239,64 @@ export class SSH {
 
           // Clean and create the target path if not exists.
           const cmd = `rm -rf ${targetPath} && mkdir -p ${targetPath}`;
-          client.exec(cmd, (err: Error, channel: ssh2.ClientChannel) => {
+          client.exec(cmd, (err, srteam) => {
             if (err) {
-              reject(err);
-              return;
+              throw err;
             }
-            client.sftp(async (error: Error, sftp: ssh2.SFTPWrapper) => {
-              if (error) {
-                reject(error);
-                return;
-              }
-
-              const files = await fs.listTree(localFolderPath);
-
-              files.forEach(async (filePath, index) => {
-                filePath = filePath
-                  .replace(/[\\]+/g, path.posix.sep)
-                  .replace(/\/$/, '');
-                const relativePath = path.posix.relative(
-                  localFolderPath,
-                  filePath
-                );
-                const remotePath = path.posix.join(targetPath, relativePath);
-
-                const remoteFolderPath = path.posix.dirname(remotePath);
-                await SSH.ensureFolder(sftp, remoteFolderPath).catch(
-                  (error: Error) => {
-                    reject(error);
-                    return;
-                  }
-                );
-
-                sftp.fastPut(filePath, remotePath, (error: Error) => {
+            srteam
+              .on('close', () => {
+                client.sftp(async (error: Error, sftp: ssh2.SFTPWrapper) => {
                   if (error) {
                     reject(error);
                     return;
                   }
-                  if (index === files.length - 1) {
-                    sftp.end();
 
-                    resolve();
-                    return;
+                  const files = await fs.listTree(localFolderPath);
+
+                  for (let i = 0; i < files.length; i++) {
+                    let filePath = files[i];
+                    filePath = filePath
+                      .replace(/[\\]+/g, path.posix.sep)
+                      .replace(/\/$/, '');
+                    const relativePath = path.posix.relative(
+                      localFolderPath,
+                      filePath
+                    );
+                    const remotePath = path.posix.join(
+                      targetPath,
+                      relativePath
+                    );
+
+                    const remoteFolderPath = path.posix.dirname(remotePath);
+                    await SSH.ensureFolder(sftp, remoteFolderPath).catch(
+                      (error: Error) => {
+                        sftp.end();
+                        reject(error);
+                        return;
+                      }
+                    );
+
+                    sftp.fastPut(filePath, remotePath, (error: Error) => {
+                      if (error) {
+                        sftp.end();
+                        reject(error);
+                        return;
+                      }
+                      if (i === files.length - 1) {
+                        sftp.end();
+                        resolve();
+                        return;
+                      }
+                    });
                   }
                 });
+              })
+              .on('data', (data: string) => {
+                console.log('STDOUT: ' + data);
+              })
+              .stderr.on('data', (data: string) => {
+                console.log('STDERR: ' + data);
               });
-            });
           });
         } catch (error) {
           reject(error);
