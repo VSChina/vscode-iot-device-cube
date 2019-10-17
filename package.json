@@ -16,7 +16,7 @@
   "icon": "logo.png",
   "aiKey": "5b869bc6-ca93-4f24-aa87-92871a3a616e",
   "engines": {
-    "vscode": "^1.36.1"
+    "vscode": "^1.39.0"
   },
   "categories": [
     "Other"
