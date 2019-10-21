@@ -108,7 +108,7 @@ export class SSH {
 
       channel.setWindow(10, 500, 10, 100);
 
-      channel.end(command + '\n');
+      channel.end(command + '\nexit\n');
     });
 
     return event;
