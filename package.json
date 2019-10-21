@@ -2,7 +2,7 @@
   "name": "vscode-iot-device-cube",
   "displayName": "IoT Device Cube",
   "description": "Utility extension to access to physical devices",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "extensionKind": "ui",
   "publisher": "vsciot-vscode",
   "repository": {
