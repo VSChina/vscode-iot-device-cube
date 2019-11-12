@@ -1,0 +1,62 @@
+language: node_js
+
+node_js:
+- 'node'
+
+services:
+- docker
+
+os:
+- linux
+dist: trusty # using Ubuntu 14.04.5 LTS
+
+branches:
+  only:
+  - master
+  - /v?[0-9]+\.[0-9]+\.[0-9]+(.*)?/
+
+env:
+  global:
+    - ISPRODTAG=^v?[0-9]+\.[0-9]+\.[0-9]+$
+    - ISTESTTAG=^v?[0-9]+\.[0-9]+\.[0-9]+-[rR][cC]$
+
+install:
+- sudo apt-get install libsecret-1-dev
+- npm install -g vsce
+- npm install
+
+script:
+- tsc --version
+- gts --version
+- gts check
+- node scripts/modifyConfigIfRCVersion.js
+- vsce package
+
+deploy:
+  # deploy to github release
+  - provider: releases
+    api_key: $GIT_TOKEN
+    file_glob: true
+    file: "*.vsix"
+    skip_cleanup: true
+    on:
+      tags: true
+      all_branches: true
+  # deploy to vscode extension market
+  - provider: script
+    script: vsce publish -p $VSCE_TOKEN --packagePath *.vsix
+    skip_cleanup: true
+    on:
+      tags: true
+      all_branches: true
+      # if it's a PROD tag (something like 1.0.0), then publish extension to market.
+      condition: "$TRAVIS_TAG =~ $ISPRODTAG"
+  # deploy test version to vscode extension market
+  - provider: script
+    script: vsce publish -p $VSCE_TEST_TOKEN --packagePath *.vsix
+    skip_cleanup: true
+    on:
+      tags: true
+      all_branches: true
+      # if it's a test version tag (something like 1.0.0-rc), then publish test extension to market.
+      condition: "$TRAVIS_TAG =~ $ISTESTTAG"
