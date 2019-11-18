@@ -5,8 +5,8 @@ if (process.env.TRAVIS_TAG) {
   if (isTestVersion) {
     const packageJson = JSON.parse(fs.readFileSync('package.json'));
 
-    const testName = "test-iot-cube";
-    const testDisplayName = "Test IoT Cube";
+    const testName = "test-albatross";
+    const testDisplayName = "Test Albatross";
     const testPublisher = "IoTDevExBuild";
     packageJson.name = testName;
     packageJson.displayName = testDisplayName;
