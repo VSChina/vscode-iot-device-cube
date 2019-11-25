@@ -6,7 +6,7 @@ if (process.env.TRAVIS_TAG) {
     const packageJson = JSON.parse(fs.readFileSync('package.json'));
 
     const testName = "test-albatross";
-    const testDisplayName = "Test Albatross";
+    const testDisplayName = "Test Albatross RC";
     const testPublisher = "IoTDevExBuild";
     packageJson.name = testName;
     packageJson.displayName = testDisplayName;
