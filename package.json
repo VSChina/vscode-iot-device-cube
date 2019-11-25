@@ -64,5 +64,8 @@
     "ssh2": "^0.8.5",
     "util": "^0.12.1",
     "volumelist": "^0.1.8"
-  }
+  },
+  "extensionDependencies": [
+    "vsciot-vscode.ms-vscode-remote.vscode-remote-extensionpack"
+  ]
 }
