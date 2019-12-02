@@ -15,7 +15,7 @@
   "preview": true,
   "homepage": "https://github.com/VSChina/vscode-iot-device-cube/blob/master/README.md",
   "icon": "logo.png",
-  "aiKey": "5b869bc6-ca93-4f24-aa87-92871a3a616e",
+  "aiKey": "[AIKEY PLACEHOLDER]",
   "engines": {
     "vscode": "^1.39.0"
   },
