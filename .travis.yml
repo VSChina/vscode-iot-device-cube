@@ -21,9 +21,19 @@ env:
     - ISTESTTAG=^v?[0-9]+\.[0-9]+\.[0-9]+-[rR][cC]
     - RC_EXTENSION_ID="iotdevexbuild.test-albatross"
 
-install:
-- sudo apt-get install libsecret-1-dev
+before_install:
+- if [ $TRAVIS_OS_NAME == "linux" ]; then
+    apt-get update;
+    apt-get install g++-multilib;
+    apt-get install -y build-essential;
+    apt-get install libudev-dev;
+  fi
+- apt-get install libsecret-1-dev
+- npm install -g node-gyp
+- npm install -g gulp
 - npm install -g vsce
+
+install:
 - npm install
 
 script:
