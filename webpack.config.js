@@ -12,7 +12,7 @@ function getEntry() {
   const mod = JSON.parse(npmListRes);
   const unbundledModule = ['impor', 'copy-paste', 'adm-zip',
   // usb-native modules can not be bundled
-  'usb-native', 'usb-detection', '@serialport/bindings', 'bindings', 'serialport'];
+  'node-usb-native', 'usb-detection', '@serialport/bindings', 'bindings', 'serialport'];
   for (const mod of unbundledModule) {
     const p = 'node_modules/' + mod;
     fs.copySync(p, 'out/node_modules/' + mod);
