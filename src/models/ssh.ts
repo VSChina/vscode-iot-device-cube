@@ -88,30 +88,32 @@ export class SSH {
   static spawn(id: number, command: string): EventEmitter {
     const event = new EventEmitter();
     const client = SSH._getClient(id);
-    client.shell((error: Error|undefined, channel: ssh2.ClientChannel|undefined) => {
-      if (error) {
-        event.emit('error', error);
-        return;
+    client.shell(
+      (error: Error | undefined, channel: ssh2.ClientChannel | undefined) => {
+        if (error) {
+          event.emit('error', error);
+          return;
+        }
+
+        if (channel) {
+          channel.on('close', () => {
+            event.emit('close');
+          });
+
+          channel.on('data', (data: Buffer) => {
+            event.emit('data', data.toString());
+          });
+
+          channel.stderr.on('data', (data: Buffer) => {
+            event.emit('data', data.toString());
+          });
+
+          channel.setWindow(10, 500, 10, 100);
+
+          channel.end(command + '\nexit\n');
+        }
       }
-
-      if (channel) {
-        channel.on('close', () => {
-          event.emit('close');
-        });
-
-        channel.on('data', (data: Buffer) => {
-          event.emit('data', data.toString());
-        });
-
-        channel.stderr.on('data', (data: Buffer) => {
-          event.emit('data', data.toString());
-        });
-
-        channel.setWindow(10, 500, 10, 100);
-
-        channel.end(command + '\nexit\n');
-      }
-    });
+    );
 
     return event;
   }
@@ -157,9 +159,9 @@ export class SSH {
   ) {
     return new Promise(
       (resolve: (value: void) => void, reject: (error: Error) => void) => {
-        sftp.readdir(remotePath, (error: Error|undefined) => {
+        sftp.readdir(remotePath, (error: Error | undefined) => {
           if (error) {
-            sftp.mkdir(remotePath, (error: Error|undefined) => {
+            sftp.mkdir(remotePath, (error: Error | undefined) => {
               if (error) {
                 reject(error);
                 return;
@@ -186,34 +188,39 @@ export class SSH {
     return new Promise(
       (resolve: (value: void) => void, reject: (reason: Error) => void) => {
         const client = SSH._getClient(id);
-        client.sftp(async (error: Error|undefined, sftp: ssh2.SFTPWrapper|undefined) => {
-          if (error) {
-            reject(error);
-            return;
-          }
-          if (!sftp) {
-            reject(new Error("cannot get client sftp"));
-            return;
-          }
-
-          targetPath = targetPath
-            .replace(/[\\]+/g, path.posix.sep)
-            .replace(/\/$/, '');
-          const remotePath = path.posix.join(
-            targetPath,
-            path.basename(localPath)
-          );
-
-          await SSH.ensureFolder(sftp, targetPath);
-          sftp.fastPut(localPath, remotePath, (error: Error|undefined) => {
+        client.sftp(
+          async (
+            error: Error | undefined,
+            sftp: ssh2.SFTPWrapper | undefined
+          ) => {
             if (error) {
               reject(error);
               return;
             }
-            resolve();
-            return;
-          });
-        });
+            if (!sftp) {
+              reject(new Error('cannot get client sftp'));
+              return;
+            }
+
+            targetPath = targetPath
+              .replace(/[\\]+/g, path.posix.sep)
+              .replace(/\/$/, '');
+            const remotePath = path.posix.join(
+              targetPath,
+              path.basename(localPath)
+            );
+
+            await SSH.ensureFolder(sftp, targetPath);
+            sftp.fastPut(localPath, remotePath, (error: Error | undefined) => {
+              if (error) {
+                reject(error);
+                return;
+              }
+              resolve();
+              return;
+            });
+          }
+        );
       }
     );
   }
@@ -250,59 +257,68 @@ export class SSH {
               throw err;
             }
             if (!stream) {
-              throw new Error("cannot valid client channel");
+              throw new Error('cannot valid client channel');
             }
             stream
               .on('close', () => {
-                client.sftp(async (error: Error|undefined, sftp: ssh2.SFTPWrapper|undefined) => {
-                  if (error) {
-                    reject(error);
-                    return;
+                client.sftp(
+                  async (
+                    error: Error | undefined,
+                    sftp: ssh2.SFTPWrapper | undefined
+                  ) => {
+                    if (error) {
+                      reject(error);
+                      return;
+                    }
+                    if (!sftp) {
+                      reject(new Error('can not get valid sftp wrapper'));
+                      return;
+                    }
+
+                    const files = await fs.listTree(localFolderPath);
+
+                    for (let i = 0; i < files.length; i++) {
+                      let filePath = files[i];
+                      filePath = filePath
+                        .replace(/[\\]+/g, path.posix.sep)
+                        .replace(/\/$/, '');
+                      const relativePath = path.posix.relative(
+                        localFolderPath,
+                        filePath
+                      );
+                      const remotePath = path.posix.join(
+                        targetPath,
+                        relativePath
+                      );
+
+                      const remoteFolderPath = path.posix.dirname(remotePath);
+                      await SSH.ensureFolder(sftp, remoteFolderPath).catch(
+                        (error: Error) => {
+                          sftp.end();
+                          reject(error);
+                          return;
+                        }
+                      );
+
+                      sftp.fastPut(
+                        filePath,
+                        remotePath,
+                        (error: Error | undefined) => {
+                          if (error) {
+                            sftp.end();
+                            reject(error);
+                            return;
+                          }
+                          if (i === files.length - 1) {
+                            sftp.end();
+                            resolve();
+                            return;
+                          }
+                        }
+                      );
+                    }
                   }
-                  if (!sftp) {
-                    reject(new Error("can not get valid sftp wrapper"));
-                    return;
-                  }
-
-                  const files = await fs.listTree(localFolderPath);
-
-                  for (let i = 0; i < files.length; i++) {
-                    let filePath = files[i];
-                    filePath = filePath
-                      .replace(/[\\]+/g, path.posix.sep)
-                      .replace(/\/$/, '');
-                    const relativePath = path.posix.relative(
-                      localFolderPath,
-                      filePath
-                    );
-                    const remotePath = path.posix.join(
-                      targetPath,
-                      relativePath
-                    );
-
-                    const remoteFolderPath = path.posix.dirname(remotePath);
-                    await SSH.ensureFolder(sftp, remoteFolderPath).catch(
-                      (error: Error) => {
-                        sftp.end();
-                        reject(error);
-                        return;
-                      }
-                    );
-
-                    sftp.fastPut(filePath, remotePath, (error: Error|undefined) => {
-                      if (error) {
-                        sftp.end();
-                        reject(error);
-                        return;
-                      }
-                      if (i === files.length - 1) {
-                        sftp.end();
-                        resolve();
-                        return;
-                      }
-                    });
-                  }
-                });
+                );
               })
               .on('data', (data: string) => {
                 console.log('STDOUT: ' + data);
