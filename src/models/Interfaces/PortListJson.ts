@@ -1,5 +1,5 @@
 export interface ComPort {
-  comName: string;
+  path: string;
   productId?: string;
   vendorId?: string;
 }
