@@ -3,7 +3,7 @@ import * as os from 'os';
 import { PortOption } from './Interfaces/PortOption';
 import { ComPort, PortListJson } from './Interfaces/PortListJson';
 
-const SerialPort = require('usb-native').SerialPort;
+const SerialPort = require('node-usb-native').SerialPort;
 
 interface SerialPortInfo {
   path: string;
