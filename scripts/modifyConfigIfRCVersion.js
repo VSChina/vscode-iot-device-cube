@@ -11,6 +11,7 @@ if (process.env.TRAVIS_TAG) {
     packageJson.name = testName;
     packageJson.displayName = testDisplayName;
     packageJson.publisher = testPublisher;
+    packageJson.aiKey = process.env['TEST_AIKEY'];
 
     const indexOfDash = packageJson.version.indexOf('-');
     if (indexOfDash > 0) {
@@ -18,7 +19,6 @@ if (process.env.TRAVIS_TAG) {
     }
 
     delete packageJson.icon;
-    delete packageJson.aiKey;
 
     fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2) + '\n');
   }
