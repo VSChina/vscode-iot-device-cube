@@ -1,7 +1,7 @@
-import * as copypaste from 'copy-paste';
+import * as clipboardy from 'clipboardy';
 
 export class Clipboard {
   static copy(text: string) {
-    copypaste.copy(text);
+    clipboardy.writeSync(text);
   }
 }
