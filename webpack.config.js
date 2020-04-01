@@ -10,7 +10,7 @@ function getEntry() {
     encoding: 'utf8'
   });
   const mod = JSON.parse(npmListRes);
-  const unbundledModule = ['impor', 'copy-paste', 'adm-zip',
+  const unbundledModule = ['impor', 'adm-zip',
   // usb-native modules can not be bundled
   'node-usb-native', 'usb-detection', '@serialport/bindings', 'bindings', 'serialport'];
   for (const mod of unbundledModule) {
