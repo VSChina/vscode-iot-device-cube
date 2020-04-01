@@ -4,6 +4,13 @@ All notable changes to the "vscode-iot-device-cube" extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## Version 0.2.0
+
+### Fixed
+
+- Serialport unable to work on VS Code, Electron v7.[[#980](https://github.com/microsoft/vscode-arduino/issues/980)]
+- glob not found issue.
+
 ## Version 0.1.4
 
 ### Fixed

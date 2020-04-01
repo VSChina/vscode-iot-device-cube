@@ -3,10 +3,10 @@ import * as os from 'os';
 import { PortOption } from './Interfaces/PortOption';
 import { ComPort, PortListJson } from './Interfaces/PortListJson';
 
-const SerialPort = require('../../vendor/node-usb-native').SerialPort;
+const SerialPort = require('node-usb-native').SerialPort;
 
 interface SerialPortInfo {
-  comName: string;
+  path: string;
   manufacturer: string;
   vendorId?: string;
   productId?: string;
@@ -41,7 +41,7 @@ export class SerialPortCtrl {
           } else {
             ports.forEach(port => {
               const com: ComPort = {
-                comName: port.comName,
+                path: port.path,
                 productId: port.productId,
                 vendorId: port.vendorId,
               };
