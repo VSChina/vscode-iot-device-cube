@@ -37,8 +37,7 @@ install:
 
 script:
 - tsc --version
-- gts --version
-- gts check
+- npm run check
 - node scripts/modifyConfigIfRCVersion.js
 - vsce package
 
