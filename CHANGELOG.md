@@ -4,6 +4,12 @@ All notable changes to the "vscode-iot-device-cube" extension will be documented
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## Version 0.3.0
+
+### Fixed
+
+- Update dependent pacakge versions to resolve security vulnerabilities.
+
 ## Version 0.2.0
 
 ### Fixed
