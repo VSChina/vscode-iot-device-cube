@@ -13,6 +13,7 @@ dist: trusty # using Ubuntu 14.04.5 LTS
 branches:
   only:
   - master
+  - develop
   - /v?[0-9]+\.[0-9]+\.[0-9]+(.*)?/
 
 env:
@@ -36,8 +37,7 @@ install:
 
 script:
 - tsc --version
-- gts --version
-- gts check
+- npm run check
 - node scripts/modifyConfigIfRCVersion.js
 - vsce package
 

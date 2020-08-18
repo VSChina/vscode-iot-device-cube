@@ -4,41 +4,26 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { PortOption } from './models/Interfaces/PortOption';
 
-const filesystem = impor(
-  './models/filesystem'
-) as typeof import('./models/filesystem');
+const filesystem = impor('./models/filesystem') as typeof import('./models/filesystem');
 
 const ssh = impor('./models/ssh') as typeof import('./models/ssh');
 
-const clipboard = impor(
-  './models/clipboard'
-) as typeof import('./models/clipboard');
+const clipboard = impor('./models/clipboard') as typeof import('./models/clipboard');
 
-const serialport = impor(
-  './models/serialportctrl'
-) as typeof import('./models/serialportctrl');
+const serialport = impor('./models/serialportctrl') as typeof import('./models/serialportctrl');
 
-export function activate(context: vscode.ExtensionContext) {
-  const serialportGetPlatform = vscode.commands.registerCommand(
-    'iotcube.serialportGetPlatform',
-    () => {
-      return serialport.SerialPortCtrl.getPlatform();
-    }
-  );
+export function activate(context: vscode.ExtensionContext): void {
+  const serialportGetPlatform = vscode.commands.registerCommand('iotcube.serialportGetPlatform', () => {
+    return serialport.SerialPortCtrl.getPlatform();
+  });
 
-  const serialportClose = vscode.commands.registerCommand(
-    'iotcube.serialportClose',
-    () => {
-      return serialport.SerialPortCtrl.close();
-    }
-  );
+  const serialportClose = vscode.commands.registerCommand('iotcube.serialportClose', () => {
+    return serialport.SerialPortCtrl.close();
+  });
 
-  const serialportSend = vscode.commands.registerCommand(
-    'iotcube.serialportSend',
-    (payload: string) => {
-      return serialport.SerialPortCtrl.send(payload);
-    }
-  );
+  const serialportSend = vscode.commands.registerCommand('iotcube.serialportSend', (payload: string) => {
+    return serialport.SerialPortCtrl.send(payload);
+  });
 
   const serialportOpen = vscode.commands.registerCommand(
     'iotcube.serialportOpen',
@@ -47,19 +32,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const serialportGetComList = vscode.commands.registerCommand(
-    'iotcube.serialportGetComList',
-    async () => {
-      return serialport.SerialPortCtrl.getComList();
-    }
-  );
+  const serialportGetComList = vscode.commands.registerCommand('iotcube.serialportGetComList', async () => {
+    return serialport.SerialPortCtrl.getComList();
+  });
 
-  const fsListVolume = vscode.commands.registerCommand(
-    'iotcube.fsListVolume',
-    async () => {
-      return filesystem.FileSystem.listVolume();
-    }
-  );
+  const fsListVolume = vscode.commands.registerCommand('iotcube.fsListVolume', async () => {
+    return filesystem.FileSystem.listVolume();
+  });
 
   const fsReadFile = vscode.commands.registerCommand(
     'iotcube.fsReadFile',
@@ -75,61 +54,37 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const fsUnzipFile = vscode.commands.registerCommand(
-    'iotcube.unzipFile',
-    (sourcePath: string, targetPath: string) => {
-      return filesystem.FileSystem.unzipFile(sourcePath, targetPath);
-    }
-  );
+  const fsUnzipFile = vscode.commands.registerCommand('iotcube.unzipFile', (sourcePath: string, targetPath: string) => {
+    return filesystem.FileSystem.unzipFile(sourcePath, targetPath);
+  });
 
-  const fsTransferFile = vscode.commands.registerCommand(
-    'iotcube.fsTransferFile',
-    (targetPath: string) => {
-      return filesystem.FileSystem.transferFile(targetPath);
-    }
-  );
+  const fsTransferFile = vscode.commands.registerCommand('iotcube.fsTransferFile', (targetPath: string) => {
+    return filesystem.FileSystem.transferFile(targetPath);
+  });
 
-  const fsGetTempDir = vscode.commands.registerCommand(
-    'iotcube.fsGetTempDir',
-    async () => {
-      return filesystem.FileSystem.getTempDir();
-    }
-  );
+  const fsGetTempDir = vscode.commands.registerCommand('iotcube.fsGetTempDir', async () => {
+    return filesystem.FileSystem.getTempDir();
+  });
 
-  const fsExists = vscode.commands.registerCommand(
-    'iotcube.fsExists',
-    async (localPath: string) => {
-      return filesystem.FileSystem.exists(localPath);
-    }
-  );
+  const fsExists = vscode.commands.registerCommand('iotcube.fsExists', async (localPath: string) => {
+    return filesystem.FileSystem.exists(localPath);
+  });
 
-  const fsIsDirectory = vscode.commands.registerCommand(
-    'iotcube.fsIsDirectory',
-    async (localPath: string) => {
-      return filesystem.FileSystem.isDirectory(localPath);
-    }
-  );
+  const fsIsDirectory = vscode.commands.registerCommand('iotcube.fsIsDirectory', async (localPath: string) => {
+    return filesystem.FileSystem.isDirectory(localPath);
+  });
 
-  const fsIsFile = vscode.commands.registerCommand(
-    'iotcube.fsIsFile',
-    async (localPath: string) => {
-      return filesystem.FileSystem.isFile(localPath);
-    }
-  );
+  const fsIsFile = vscode.commands.registerCommand('iotcube.fsIsFile', async (localPath: string) => {
+    return filesystem.FileSystem.isFile(localPath);
+  });
 
-  const fsMkDir = vscode.commands.registerCommand(
-    'iotcube.fsMkDir',
-    async (localPath: string) => {
-      return filesystem.FileSystem.mkDir(localPath);
-    }
-  );
+  const fsMkDir = vscode.commands.registerCommand('iotcube.fsMkDir', async (localPath: string) => {
+    return filesystem.FileSystem.mkDir(localPath);
+  });
 
-  const sshDiscover = vscode.commands.registerCommand(
-    'iotcube.sshDiscover',
-    async () => {
-      return ssh.SSH.discover();
-    }
-  );
+  const sshDiscover = vscode.commands.registerCommand('iotcube.sshDiscover', async () => {
+    return ssh.SSH.discover();
+  });
 
   const sshOpen = vscode.commands.registerCommand(
     'iotcube.sshOpen',
@@ -138,12 +93,9 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const sshClose = vscode.commands.registerCommand(
-    'iotcube.sshClose',
-    async (id: number) => {
-      return ssh.SSH.close(id);
-    }
-  );
+  const sshClose = vscode.commands.registerCommand('iotcube.sshClose', async (id: number) => {
+    return ssh.SSH.close(id);
+  });
 
   const sshSpawn = vscode.commands.registerCommand(
     'iotcube.sshSpawn',
@@ -169,12 +121,9 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const sshExec = vscode.commands.registerCommand(
-    'iotcube.sshExec',
-    async (id: number, command: string) => {
-      return ssh.SSH.exec(id, command);
-    }
-  );
+  const sshExec = vscode.commands.registerCommand('iotcube.sshExec', async (id: number, command: string) => {
+    return ssh.SSH.exec(id, command);
+  });
 
   const sshUploadFile = vscode.commands.registerCommand(
     'iotcube.sshUploadFile',
@@ -190,36 +139,26 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const openInContainer = vscode.commands.registerCommand(
-    'iotcube.openInContainer',
-    async (localPath: string) => {
-      const containerPath = `/workspaces/${path.basename(localPath)}`;
-      const uri = vscode.Uri.parse(
-        `vscode-remote://dev-container+${Buffer.from(
-          localPath,
-          'utf8'
-        ).toString('hex')}${containerPath}`
-      );
-      await vscode.commands.executeCommand('vscode.openFolder', uri);
-      return;
-    }
-  );
+  const openInContainer = vscode.commands.registerCommand('iotcube.openInContainer', async (localPath: string) => {
+    const containerPath = `/workspaces/${path.basename(localPath)}`;
+    const uri = vscode.Uri.parse(
+      `vscode-remote://dev-container+${Buffer.from(localPath, 'utf8').toString('hex')}${containerPath}`
+    );
+    await vscode.commands.executeCommand('vscode.openFolder', uri);
+    return;
+  });
 
   const openLocally = vscode.commands.registerCommand(
     'iotcube.openLocally',
     async (localPath: string, openInNewWindow = false) => {
-      await vscode.commands.executeCommand(
-        'vscode.openFolder',
-        vscode.Uri.file(localPath),
-        openInNewWindow
-      );
+      await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(localPath), openInNewWindow);
       return;
     }
   );
 
   const localRequire = vscode.commands.registerCommand(
     'iotcube.localRequire',
-    // tslint:disable-next-line:no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (modId: string, memeber: string, args?: any[]) => {
       const m = await import(modId);
       if (args) {
@@ -234,12 +173,9 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const clipboardCopy = vscode.commands.registerCommand(
-    'iotcube.clipboardCopy',
-    (text: string) => {
-      clipboard.Clipboard.copy(text);
-    }
-  );
+  const clipboardCopy = vscode.commands.registerCommand('iotcube.clipboardCopy', (text: string) => {
+    clipboard.Clipboard.copy(text);
+  });
 
   context.subscriptions.push(serialportGetPlatform);
   context.subscriptions.push(serialportClose);
@@ -269,4 +205,5 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(clipboardCopy);
 }
 
-export function deactivate() {}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export function deactivate(): void {}

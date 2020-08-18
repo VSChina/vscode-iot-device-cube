@@ -16,10 +16,10 @@ interface SerialPortInfo {
  * Control serialports on host machine.
  */
 export class SerialPortCtrl {
-  // tslint:disable-next-line: no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static _port: any;
 
-  static getPlatform() {
+  static getPlatform(): NodeJS.Platform {
     return os.platform();
   }
 
@@ -27,34 +27,28 @@ export class SerialPortCtrl {
    * Get serialport list.
    */
   static async getComList(): Promise<PortListJson> {
-    return new Promise(
-      (
-        resolve: (value: PortListJson) => void,
-        reject: (error: Error) => void
-      ) => {
-        // tslint:disable-next-line: no-any
-        const portList: ComPort[] = [];
-        // tslint:disable-next-line: no-any
-        SerialPort.list((err: any, ports: SerialPortInfo[]) => {
-          if (err) {
-            reject(err);
-          } else {
-            ports.forEach(port => {
-              const com: ComPort = {
-                path: port.path,
-                productId: port.productId,
-                vendorId: port.vendorId,
-              };
-              portList.push(com);
-            });
-            const portListJson = {
-              portList,
+    return new Promise((resolve: (value: PortListJson) => void, reject: (error: Error) => void) => {
+      const portList: ComPort[] = [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      SerialPort.list((err: any, ports: SerialPortInfo[]) => {
+        if (err) {
+          reject(err);
+        } else {
+          ports.forEach((port) => {
+            const com: ComPort = {
+              path: port.path,
+              productId: port.productId,
+              vendorId: port.vendorId,
             };
-            resolve(portListJson);
-          }
-        });
-      }
-    );
+            portList.push(com);
+          });
+          const portListJson = {
+            portList,
+          };
+          resolve(portListJson);
+        }
+      });
+    });
   }
 
   /**
@@ -62,16 +56,14 @@ export class SerialPortCtrl {
    * @param comPort name of serialport.
    * @param option option of opening a serialport.
    */
-  static async open(comPort: string, option: PortOption) {
+  static async open(comPort: string, option: PortOption): Promise<void> {
     let monitorCallbackCommandName: string;
     try {
       monitorCallbackCommandName = (await vscode.commands.executeCommand(
         'iotworkbench.getMonitorCallbackCommandName'
       )) as string;
       if (!monitorCallbackCommandName) {
-        throw new Error(
-          `Fail to get iot workbench monitor callback command name`
-        );
+        throw new Error(`Fail to get iot workbench monitor callback command name`);
       }
       SerialPortCtrl._port = await new SerialPort(comPort, option);
     } catch (err) {
@@ -91,7 +83,7 @@ export class SerialPortCtrl {
         throw err;
       }
     });
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     SerialPortCtrl._port.on('data', async (data: any) => {
       try {
         await vscode.commands.executeCommand(
@@ -106,12 +98,7 @@ export class SerialPortCtrl {
     });
     SerialPortCtrl._port.on('error', async (err: Error) => {
       try {
-        vscode.commands.executeCommand(
-          monitorCallbackCommandName,
-          'error',
-          payloadPlaceHolder,
-          err.message
-        );
+        vscode.commands.executeCommand(monitorCallbackCommandName, 'error', payloadPlaceHolder, err.message);
       } catch (err) {
         throw err;
       }
@@ -128,6 +115,7 @@ export class SerialPortCtrl {
         throw err;
       }
     });
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     SerialPortCtrl._port.on('drain', () => {});
   }
 
@@ -135,36 +123,32 @@ export class SerialPortCtrl {
    * Write data to serialport.
    * @param payload data to write.
    */
-  static send(payload: string) {
-    return new Promise(
-      (resolve: (value: void) => void, reject: (reason: Error) => void) => {
-        try {
-          // tslint:disable-next-line: no-any
-          SerialPortCtrl._port.write(payload, (err: any) => {
-            if (err) {
-              reject(err);
-            } else {
-              SerialPortCtrl._port.drain(() => resolve());
-            }
-          });
-        } catch (err) {
-          reject(err);
-        }
-      }
-    );
-  }
-
-  static close() {
-    return new Promise(
-      (resolve: (value: void) => void, reject: (value: Error) => void) => {
-        SerialPortCtrl._port.close((err: Error) => {
+  static send(payload: string): Promise<void> {
+    return new Promise((resolve: (value: void) => void, reject: (reason: Error) => void) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        SerialPortCtrl._port.write(payload, (err: any) => {
           if (err) {
             reject(err);
-            return;
+          } else {
+            SerialPortCtrl._port.drain(() => resolve());
           }
-          resolve();
         });
+      } catch (err) {
+        reject(err);
       }
-    );
+    });
+  }
+
+  static close(): Promise<void> {
+    return new Promise((resolve: (value: void) => void, reject: (value: Error) => void) => {
+      SerialPortCtrl._port.close((err: Error) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+    });
   }
 }
