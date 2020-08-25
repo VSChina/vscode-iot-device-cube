@@ -20,7 +20,6 @@ env:
   global:
     - ISPRODTAG=^v?[0-9]+\.[0-9]+\.[0-9]+$
     - ISTESTTAG=^v?[0-9]+\.[0-9]+\.[0-9]+-[rR][cC]
-    - RC_EXTENSION_ID="iotdevexbuild.test-albatross"
 
 before_install:
 - if [ $TRAVIS_OS_NAME == "linux" ]; then
@@ -58,14 +57,5 @@ deploy:
     on:
       tags: true
       all_branches: true
-      # if it's a PROD tag (something like 1.0.0), then publish extension to market.
+      # if it's a PROD tag (something like v1.0.0), then publish extension to market.
       condition: "$TRAVIS_TAG =~ $ISPRODTAG"
-  # deploy test version to vscode extension market
-  - provider: script
-    script: yes | vsce unpublish -p $VSCE_TEST_TOKEN $RC_EXTENSION_ID && vsce publish -p $VSCE_TEST_TOKEN --packagePath *.vsix
-    skip_cleanup: true
-    on:
-      tags: true
-      all_branches: true
-      # if it's a test version tag (something like 1.0.0-rc), then publish test extension to market.
-      condition: "$TRAVIS_TAG =~ $ISTESTTAG"
